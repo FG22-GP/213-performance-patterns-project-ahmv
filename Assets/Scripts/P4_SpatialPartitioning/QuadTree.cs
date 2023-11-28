@@ -43,27 +43,31 @@ public class QuadTree
         float subHeight = bounds.height / 2f;
         float x = bounds.x;
         float y = bounds.y;
-
-        children[0] = new QuadTree(level + 1, new Rect(x - subWidth, y - subHeight, subWidth, subHeight));
-        children[1] = new QuadTree(level + 1, new Rect(x + subWidth, y - subHeight, subWidth, subHeight));
-        children[2] = new QuadTree(level + 1, new Rect(x - subWidth, y + subHeight, subWidth, subHeight));
-        children[3] = new QuadTree(level + 1, new Rect(x + subWidth, y + subHeight, subWidth, subHeight));
-
+        
+        // Top Right
+        children[0] = new QuadTree(level + 1, new Rect(x + subWidth, y, subWidth, subHeight));
+        // Top Left
+        children[1] = new QuadTree(level + 1, new Rect(x, y, subWidth, subHeight));
+        // Bottom Left
+        children[2] = new QuadTree(level + 1, new Rect(x, y - subHeight, subWidth, subHeight));
+        // Bottom Right
+        children[3] = new QuadTree(level + 1, new Rect(x + subWidth, y - subHeight, subWidth, subHeight));
     }
 
     private int GetIndex(GameObject obj)
     {
         int index = -1;
-        float verticalMidpoint = bounds.y + bounds.height / 2f;
+        float horizontalMidpoint = bounds.y - bounds.height / 2f;
+        float verticalMidpoint = bounds.x + bounds.width / 2f;
 
         // Object can fit completely within the top quadrants
-        bool topQuadrant = obj.transform.position.y > verticalMidpoint;
+        bool topQuadrant = obj.transform.position.y > horizontalMidpoint && obj.transform.position.y < bounds.y;
 
         // Object can fit completely within the bottom quadrants
-        bool bottomQuadrant = obj.transform.position.y < verticalMidpoint;
+        bool bottomQuadrant = !topQuadrant && obj.transform.position.y > horizontalMidpoint - bounds.height / 2f;
 
         // Object can fit completely within the left quadrants
-        if (obj.transform.position.x < bounds.x && obj.transform.position.x - obj.transform.localScale.x / 2f < bounds.x)
+        if (obj.transform.position.x < verticalMidpoint && obj.transform.position.x > bounds.x)
         {
             if (topQuadrant)
             {
@@ -71,11 +75,12 @@ public class QuadTree
             }
             else if (bottomQuadrant)
             {
+                Debug.Log("2 Index");
                 index = 2;
             }
         }
         // Object can fit completely within the right quadrants
-        else if (obj.transform.position.x > bounds.x && obj.transform.position.x + obj.transform.localScale.x / 2f > bounds.x)
+        else if (obj.transform.position.x > verticalMidpoint && obj.transform.position.x < verticalMidpoint + bounds.width / 2f)
         {
             if (topQuadrant)
             {
@@ -83,6 +88,7 @@ public class QuadTree
             }
             else if (bottomQuadrant)
             {
+                Debug.Log("3 Index");
                 index = 3;
             }
         }
@@ -154,8 +160,6 @@ public class QuadTree
             if(child == null)continue;
             
             allBounds.AddRange(child.GetAllBounds());
-            
-            Debug.Log(allBounds.Count);
         }
         
         return allBounds;
