@@ -1,12 +1,16 @@
 using System.Threading;
 using UnityEngine;
 
+[RequireComponent(typeof(PooledObject))]
 public class Enemy : MonoBehaviour
 {
     private Castle _castle;
-    
+    private PooledObject pooledObject;
+    private bool isCastleNull => _castle == null;
+
     void Start()
     {
+        pooledObject = GetComponent<PooledObject>();
         this._castle = GameObject.FindWithTag("Player").GetComponent<Castle>();
         FakeSetUpEnemy();
     }
@@ -19,6 +23,7 @@ public class Enemy : MonoBehaviour
     /// </summary>
     void FakeSetUpEnemy()
     {
+        print("Sleep");
         Thread.Sleep(25);
     }
 
@@ -48,6 +53,7 @@ public class Enemy : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("OnCollision!");
-        Destroy(this.gameObject);
+        if (pooledObject == null) GetComponent<PooledObject>();
+        pooledObject.ReturnToPool();
     }
 }
