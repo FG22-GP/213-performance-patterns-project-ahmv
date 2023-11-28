@@ -4,7 +4,8 @@ using UnityEngine;
 [Serializable]
 public class TreeSeasonColors
 {
-    [SerializeField] private ColorInfo[] colors;
+    public FlyWeight flyWeight;
+    private ColorInfo[] Colors => flyWeight.TreeColors.colors;
     
     /// <summary>
     /// This returns the current color. The value changes every time
@@ -14,8 +15,8 @@ public class TreeSeasonColors
     {
         get
         {
-            var colorInfo = colors[_index];
-            return new Color(colorInfo.r, colorInfo.g, colorInfo.b, 1f);
+            var colorInfo = Colors[_index];
+            return new Color(colorInfo.r / 255.0f, colorInfo.g / 255.0f, colorInfo.b / 255.0f, 1f);
         }
     }
 
@@ -25,7 +26,7 @@ public class TreeSeasonColors
     public void MoveNext()
     {
         _index += 10;
-        _index %= colors.Length;
+        _index %= Colors.Length;
     }
 
     private int _index;

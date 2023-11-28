@@ -9,23 +9,29 @@ public class TreeSpawner : MonoBehaviour
 {
     public Tree TreePrefab;
     private float _currentCooldown;
+    private const float TotalCooldown = 0.2f;
+    [SerializeField] private FlyWeight _flyWeight;
     
-    const float _totalCooldown = 0.2f;
-    
-    void FixedUpdate()
+    private void Start()
     {
-        this._currentCooldown -= Time.deltaTime;
-        if (this._currentCooldown <= 0f)
+        _flyWeight.Setup();
+    }
+    
+    private void FixedUpdate()
+    {
+        _currentCooldown -= Time.deltaTime;
+        if (_currentCooldown <= 0f)
         {
-            this._currentCooldown += _totalCooldown;
+            _currentCooldown += TotalCooldown;
             SpawnTree();
         }
     }
 
-    void SpawnTree()
+    private void SpawnTree()
     {
         var randomPositionX = Random.Range(-6f, 6f);
         var randomPositionY = Random.Range(-6f, 6f);
-        Instantiate(this.TreePrefab, new Vector2(randomPositionX, randomPositionY), Quaternion.identity);
+        Tree spawnedTree = Instantiate(TreePrefab, new Vector2(randomPositionX, randomPositionY), Quaternion.identity);
+        spawnedTree._treeColors.flyWeight = _flyWeight;
     }
 }
