@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
+[RequireComponent(typeof(PooledObject))]
 public class Projectile : MonoBehaviour
 {
+    private PooledObject pooledObject;
     private float _totalTime;
     void Start()
     {
+        pooledObject = GetComponent<PooledObject>();
         FakeInitializeProjectile();
     }
 
@@ -20,6 +23,7 @@ public class Projectile : MonoBehaviour
     /// </summary>
     void FakeInitializeProjectile()
     {
+        print("Sleep");
         Thread.Sleep(100);
     }
     
@@ -30,13 +34,15 @@ public class Projectile : MonoBehaviour
         this.transform.Translate(Vector3.up * Time.deltaTime);
         if (this._totalTime > 10f)
         {
-            Destroy(this.gameObject);
+            if (pooledObject == null) pooledObject = GetComponent<PooledObject>();
+            pooledObject.ReturnToPool();
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("On Collision!");
-        Destroy(this.gameObject);
+        if (pooledObject == null) pooledObject = GetComponent<PooledObject>();
+        pooledObject.ReturnToPool();
     }
 }

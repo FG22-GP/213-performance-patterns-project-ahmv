@@ -6,13 +6,26 @@ using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour
 {
+    [SerializeField] private ObjectPool enemyPool;
+    
     public Enemy EnemyPrefab;
     private const float _totalCooldown = 2f;
     private float _currentCooldown;
 
+    private void Start()
+    {
+        if (enemyPool == null)
+        {
+            print("Enemy Pool not in place");
+            Application.Quit();
+        }
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
+        enemyPool.FutureObjectCount = Mathf.CeilToInt((Time.timeSinceLevelLoad + 5)/ 7);
+        
         this._currentCooldown -= Time.deltaTime;
         if (this._currentCooldown <= 0f)
         {
@@ -34,8 +47,12 @@ public class EnemySpawner : MonoBehaviour
 
     void SpawnEnemy()
     {
-        var randomPositionX = Random.Range(-6f, 6f);
-        var randomPositionY = Random.Range(-6f, 6f);
-        Instantiate(this.EnemyPrefab, new Vector2(randomPositionX, randomPositionY), Quaternion.identity);
+        float randomPositionX = Random.Range(-6f, 6f);
+        float randomPositionY = Random.Range(-6f, 6f);
+        
+        PooledObject enemy = enemyPool.RequestPooledObject();
+        Transform enemyTransform = enemy.transform;
+        enemyTransform.position = new Vector2(randomPositionX, randomPositionY);
+        enemyTransform.rotation = Quaternion.identity;
     }
 }

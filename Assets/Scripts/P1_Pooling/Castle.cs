@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class Castle : MonoBehaviour
 {
+    [SerializeField] private ObjectPool projectilePool;
     public Projectile Projectile;
 
-    private Transform _target;
+    [SerializeField] private Transform _target;
     private int _enemyLayerMask;
     private float _currentCooldown;
     
@@ -14,34 +15,49 @@ public class Castle : MonoBehaviour
     void Start()
     {
         this._enemyLayerMask = LayerMask.GetMask("Enemy");
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (this._target == null)
+        {
+            AcquireTarget();
+        }
+        
+        if (this._target == null) return;
+        
         AcquireTargetIfNecessary();
         TryAttack();
     }
 
     void AcquireTargetIfNecessary()
     {
-        if (this._target == null)
+        if (!this._target.gameObject.activeSelf)
         {
-            this._target = Physics2D.OverlapCircle(this.transform.position, 5f, this._enemyLayerMask)?.transform;
+            AcquireTarget();
         }
+    }
+
+    void AcquireTarget()
+    {
+        this._target = Physics2D.OverlapCircle(this.transform.position, 5f, this._enemyLayerMask)?.transform;
     }
 
     void TryAttack()
     {
         _currentCooldown -= Time.deltaTime;
-        if (this._target == null || !(_currentCooldown <= 0f)) return;
+        if (!this._target.gameObject.activeSelf || !(_currentCooldown <= 0f)) return; 
         this._currentCooldown = _maxCooldown;
         Attack();
     }
 
     void Attack()
     {
-        Instantiate(this.Projectile, this.transform.position, GetTargetDirection());
+        PooledObject projectile = projectilePool.RequestPooledObject();
+        projectile.transform.position = this.transform.position;
+        projectile.transform.rotation = GetTargetDirection();
     }
 
     Quaternion GetTargetDirection()

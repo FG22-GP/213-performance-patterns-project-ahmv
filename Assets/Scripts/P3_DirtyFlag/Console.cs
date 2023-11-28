@@ -33,7 +33,7 @@ public class Console : MonoBehaviour
         SimulateVariousChangesOfParameters();
 
         // This will on random occasion return true
-        if (ShouldUseComputedParameterThisFrame())
+        if(ShouldUseComputedParameterThisFrame())
             UtilizeComputedParameter(); // this is where the computed parameter is used
     }
 
@@ -64,8 +64,6 @@ public class Console : MonoBehaviour
     void SetRed(int red)
     {
         this._redParameter = red;
-        // When the parameter has changed, the computed parameter needs to be updated
-        CalculateComputedDataFromParameters();
     }
 
     /// <summary>
@@ -75,8 +73,6 @@ public class Console : MonoBehaviour
     void SetGreen(int green)
     {
         this._greenParameter = green;
-        // When the parameter has changed, the computed parameter needs to be updated
-        CalculateComputedDataFromParameters();
     }
 
     /// <summary>
@@ -86,8 +82,6 @@ public class Console : MonoBehaviour
     void SetBlue(int blue)
     {
         this._blueParameter = blue;
-        // When the parameter has changed, the computed parameter needs to be updated
-        CalculateComputedDataFromParameters();
     }
 
     /// <summary>
@@ -120,7 +114,8 @@ public class Console : MonoBehaviour
         } // IGNORE THIS
         Debug.Log($"Updated: {_totalUpdateCount}/{_requiredUpdateCount} times."); // IGNORE THIS
         #endregion // debug information on how many updates would've been necessary
-            
+         
+        CalculateComputedDataFromParameters();
         this._spriteRenderer.color = this._computedColor;
     }
 }
