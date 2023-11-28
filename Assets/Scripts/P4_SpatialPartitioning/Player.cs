@@ -1,14 +1,23 @@
+using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Input = UnityEngine.Input;
 
 public class Player : MonoBehaviour
 {
     private Camera _cam;
+    private GameObject[] allCars;
 
+    [SerializeField] private QuadTreeReferenceHolder quadTreeReferenceHolder;
+    private QuadTree quadTree => quadTreeReferenceHolder.QuadTree;
+    
     void Start()
     {
         this._cam = Camera.main;
+        allCars = GameObject.FindGameObjectsWithTag("Car");
+        
+        quadTree.Insert(this.gameObject);
     }
     
     void Update()
@@ -30,12 +39,13 @@ public class Player : MonoBehaviour
 
     GameObject FindClosestCar()
     {
-        var allCars = GameObject.FindGameObjectsWithTag("Car");
+        
         GameObject closestCar = null;
         float distance = float.PositiveInfinity;
-        
+
+        List<GameObject> closestCars = quadTree.Retrieve(new List<GameObject>(), this.gameObject);  
         // Problem: We need to check all cars in the scene to find the closest one.
-        foreach (var car in allCars)
+        foreach (var car in closestCars)
         {
             var currentDistance = CalculateDistanceTo(car.transform);
             if (currentDistance < distance)
@@ -54,4 +64,6 @@ public class Player : MonoBehaviour
         Thread.Sleep(1);
         return Vector3.Distance(target.position, this.transform.position);
     }
+    
+    
 }
