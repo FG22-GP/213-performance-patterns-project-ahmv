@@ -16,8 +16,6 @@ public class Player : MonoBehaviour
     {
         this._cam = Camera.main;
         allCars = GameObject.FindGameObjectsWithTag("Car");
-        
-        quadTree.Insert(this.gameObject);
     }
     
     void Update()
